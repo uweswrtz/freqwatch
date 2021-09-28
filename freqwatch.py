@@ -328,7 +328,7 @@ schedule = IntervalSchedule(
 
 
 # define Prefect flow
-with Flow("BOTWATCHER", schedule=schedule) as flow:
+with Flow("FREQWATCH", schedule=schedule) as flow:
     configfile = Parameter("configfile", default="config.json")
     output = Parameter("output", default="html")
     config = load_config(configfile)
