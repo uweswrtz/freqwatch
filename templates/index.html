@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="title">{% block title %} Bot summary {% endblock %}</h1>
+    <p>last updated: {{ now }}</p>
+    <h2 class="subtitle">{{ totals['active_bots'] }} active bots with total profit {{ '%0.2f'| format(totals['profit']['profit_closed_fiat']|float) }}</h2>
+    <h2 class="subtitle">today: {{ '%0.2f'| format(totals['profit']['today_profit_fiat']|float) }} yesterday: {{ '%0.2f'| format(totals['profit']['yesterday_profit_fiat']|float)}}</h2>
+
+
+    <div class="table-container">
+    <table class="table is-narrow is-striped">
+        <!-- Table headers -->
+            <th>
+                <tr>
+                    <td>Name</td>
+                    <td>Ex</td>
+                    <td>Strategy</td>
+                    <td>Today <br />fiat</td>
+                    <td>Today <br />#</td>
+                    <td>open</td>
+                    <td>Prof/<br />day</td>
+                    <td>Amount</td>
+                    <td>Curr</td>
+                    <td>Edge</td>
+                    
+                    <td>Profit</td>
+                    <td>Prof<br />fiat</td>
+                    
+                    <td>Days</td>
+                    <td>Win <br />rate</td>
+                    <td>W</td>
+                    <td>L</td>
+
+                    <td>7d<br />prof</td>
+                    <td>version</td>
+                    <td>daily</td> <td>for </td> <td> last </td> <td>7d</td>
+                </tr>
+            </th>
+            <tbody>
+    {% for bot in bot_data %}
+    <!-- <a href="#">
+        <h2>{{ bot['bot_name'] }}</h2>
+    </a>
+    <span class="badge badge-primary">{{ bot['stake_current'] }}</span>
+    <hr> -->
+
+          
+        <!-- table rows -->
+        <tr>
+            <td><a href="{{bot['server_url']}}" target="_blank"> {{ bot['bot_name'] }}</a></td>
+
+            <td>{{ bot['show_config']['exchange'] }}</td>
+            <td>{{ bot['show_config']['strategy'] }}</td>
+
+
+            <td class="has-text-right">{{ '%0.2f'| format(bot['daily_data'][0]['fiat_value']|float)}}</td>
+            <td class="has-text-right">{{ bot['daily_data'][0]['trade_count'] }}</td>
+            <td class="has-text-right ">
+                {% if bot['count']['current'] > 0 %}
+                    {% if (bot['status'][0]['open_hours'] ) > 24 %}
+                        <button class="button is-danger is-fullwidth">{{ bot['count']['current'] }}({{ bot['status'][0]['open_hours'] }})</button>
+                    {% elif (bot['status'][0]['open_hours'] ) > 4 %}
+                        <button class="button is-warning is-fullwidth">{{ bot['count']['current'] }}({{ bot['status'][0]['open_hours'] }}) </button>    
+                    {% else %}
+                        <button class="button is-success is-light is-fullwidth">{{ bot['count']['current'] }}({{ bot['status'][0]['open_hours'] }})</button>
+                    {% endif %}
+                     
+                {% else %}
+                    {{ bot['count']['current'] }}          
+                {% endif %}
+            </td>
+
+            <td class="has-text-right has-text-weight-bold">{{ '%0.2f'| format(bot['profit']['avg_per_day_all_time_fiat']|float) }}</td>
+            <td>{{ bot['show_config']['stake_amount'] }}</td>
+            <td>{{ bot['show_config']['stake_currency'] }}</td>
+            <td>
+                {% if (bot['show_config']['edge_pairs_nr'] ) > 0 %}
+                    <button class="button is-success is-light is-fullwidth">{{ bot['show_config']['edge_pairs_nr']  }} </button>
+                {% else %}
+                    <button class="button is-warning is-light is-fullwidth">OFF</button>    
+                {% endif %}
+            </td>
+            
+            <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_coin']|float) }}</td>
+            <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_fiat']|float) }}</td>
+            
+            <td class="has-text-right ">{{ bot['profit']['first_trade_days'] }}</td>
+            <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['winning_rate']|float) }}</td>
+            <td class="has-text-right">{{ bot['profit']['winning_trades'] }}</td>
+            <td class="has-text-right">{{ bot['profit']['losing_trades'] }}</td>
+
+            <td class="has-text-right has-text-weight-bold">{{ '%0.2f'| format(bot['daily_data']|sum(attribute='fiat_value')) }}</td>
+
+            <td>{{ bot['version']['version'] }}</td>
+            {% for daily in bot['daily_data'] %}
+            <td class="has-text-right">{{ '%0.2f'| format(daily['fiat_value']|float)}}</td>
+            <td class="has-text-right">{{ daily['trade_count'] }}</td>
+            {% endfor %}
+            
+            <td>{{ bot['show_config']['bot_name'] }}</td>
+            
+
+          
+            
+          
+{% endfor %}
+</tr>
+</tbody>          
+</table>
+</div>
+
+{% endblock %}

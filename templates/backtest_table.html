@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="title">{% block title %} Backtest summary {% endblock %}</h1>
+    <p>last updated: {{ now }}</p>
+    {# <h2 class="subtitle">{{ totals['active_bots'] }} active bots with total profit {{ '%0.2f'| format(totals['profit']['profit_closed_fiat']|float) }}</h2>  #}
+    {#  <h2 class="subtitle">today: {{ '%0.2f'| format(totals['profit']['today_profit_fiat']|float) }} yesterday: {{ '%0.2f'| format(totals['profit']['yesterday_profit_fiat']|float)}}</h2>  #}
+    <p> <a href="backtest_comparison.xlsx" target="_blank">backtest_comparison.xlsx</a></p>
+
+    <div class="table-container">
+        {{ table }}
+    </div>
+{% endblock %}
