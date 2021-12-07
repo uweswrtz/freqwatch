@@ -8,32 +8,36 @@
 
 
     <div class="table-container">
-    <table class="table is-narrow is-striped">
+    <table class="table is-striped is-narrow">
         <!-- Table headers -->
             <th>
                 <tr>
                     <td>Name</td>
                     <td>Ex</td>
                     <td>Strategy</td>
-                    <td>Today <br />fiat</td>
-                    <td>Today <br />#</td>
+                    <td>time<br />frame</td>
+                    <td>tod.<br />fiat</td>
+                    <td>tod.<br />#</td>
                     <td>open</td>
-                    <td>Prof/<br />day</td>
-                    <td>Amount</td>
+                    <td>prof/<br />day</td>
+                    <td>am.</td>
                     <td>Curr</td>
+                    <td>trail</td>
                     <td>Edge</td>
-                    
+                    <td>#<br />lo<br />op</td>
+                    <td>total<br />max<br />need</td>
                     <td>Profit</td>
                     <td>Prof<br />fiat</td>
                     
                     <td>Days</td>
-                    <td>Win <br />rate</td>
+                    <td>Win<br />rate</td>
                     <td>W</td>
                     <td>L</td>
 
                     <td>7d<br />prof</td>
                     <td>version</td>
-                    <td>daily</td> <td>for </td> <td> last </td> <td>7d</td>
+                    <td>today</td> <td>-1d</td> <td>-2d</td> <td>-3d</td><td>-4d</td><td>-5d</td><td>-6d</td>
+                    <td>amazingsuperlongfilename</td>
                 </tr>
             </th>
             <tbody>
@@ -51,28 +55,29 @@
 
             <td>{{ bot['show_config']['exchange'] }}</td>
             <td>{{ bot['show_config']['strategy'] }}</td>
-
+            <td>{{ bot['show_config']['timeframe'] }}</td>
 
             <td class="has-text-right">{{ '%0.2f'| format(bot['daily_data'][0]['fiat_value']|float)}}</td>
             <td class="has-text-right">{{ bot['daily_data'][0]['trade_count'] }}</td>
             <td class="has-text-right ">
                 {% if bot['count']['current'] > 0 %}
-                    {% if (bot['status'][0]['open_hours'] ) > 24 %}
-                        <button class="button is-danger is-fullwidth">{{ bot['count']['current'] }}({{ bot['status'][0]['open_hours'] }})</button>
-                    {% elif (bot['status'][0]['open_hours'] ) > 4 %}
-                        <button class="button is-warning is-fullwidth">{{ bot['count']['current'] }}({{ bot['status'][0]['open_hours'] }}) </button>    
+                    {% if (bot['status'][0]['open_hours'] ) > 48 %}
+                        <button class="button is-danger is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }} ({{ bot['status'][0]['open_hours'] }})</button>
+                    {% elif (bot['status'][0]['open_hours'] ) > 24 %}
+                        <button class="button is-warning is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }} ({{ bot['status'][0]['open_hours'] }}) </button>    
                     {% else %}
-                        <button class="button is-success is-light is-fullwidth">{{ bot['count']['current'] }}({{ bot['status'][0]['open_hours'] }})</button>
+                        <button class="button is-success is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }} ({{ bot['status'][0]['open_hours'] }})</button>
                     {% endif %}
                      
                 {% else %}
-                    {{ bot['count']['current'] }}          
+                    {{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }}          
                 {% endif %}
             </td>
 
             <td class="has-text-right has-text-weight-bold">{{ '%0.2f'| format(bot['profit']['avg_per_day_all_time_fiat']|float) }}</td>
             <td>{{ bot['show_config']['stake_amount'] }}</td>
             <td>{{ bot['show_config']['stake_currency'] }}</td>
+            <td>{{ bot['show_config']['trailing_stop'] }}</td>
             <td>
                 {% if (bot['show_config']['edge_pairs_nr'] ) > 0 %}
                     <button class="button is-success is-light is-fullwidth">{{ bot['show_config']['edge_pairs_nr']  }} </button>
@@ -80,7 +85,8 @@
                     <button class="button is-warning is-light is-fullwidth">OFF</button>    
                 {% endif %}
             </td>
-            
+            <td>{{ bot['count']['nr_long_open'] }}</td>
+            <td>{{ bot['count']['total_max_needed'] }}</td>
             <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_coin']|float) }}</td>
             <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_fiat']|float) }}</td>
             
@@ -93,11 +99,12 @@
 
             <td>{{ bot['version']['version'] }}</td>
             {% for daily in bot['daily_data'] %}
-            <td class="has-text-right">{{ '%0.2f'| format(daily['fiat_value']|float)}}</td>
-            <td class="has-text-right">{{ daily['trade_count'] }}</td>
+            <td class="has-text-right">{{ '%0.2f'| format(daily['fiat_value']|float)}} ({{ daily['trade_count'] }})</td>
+
             {% endfor %}
             
             <td>{{ bot['show_config']['bot_name'] }}</td>
+
             
 
           

@@ -204,7 +204,7 @@ def get_data(config):
 
 
 @task
-def calculate_daily(data):
+def calculate_per_bot(data):
 
     now = datetime.utcnow().timestamp()
 
@@ -241,6 +241,8 @@ def calculate_daily(data):
         else:
             bot["profit"]["winning_rate"] = 0
 
+        bot["count"]["nr_long_open"] = 0
+        bot["count"]["total_max_needed"] = 0  #
         if bot["count"]["current"] > 0:
 
             bot["status"][0]["open_days"] = (
@@ -250,12 +252,19 @@ def calculate_daily(data):
                 divmod((now - bot["status"][0]["open_timestamp"] / 1000), 60 * 60)[0]
             )
 
+            for ot in bot["status"]:
+                if int( divmod((now - ot["open_timestamp"] / 1000), 60 * 60)[0]) > 12:
+                    bot["count"]["nr_long_open"] += 1     
+
+            # nr more neede to have at least max running
+            bot["count"]["total_max_needed"] = bot["count"]["max"] + bot["count"]["nr_long_open"]
+
         if isinstance(bot["edge"], list):
             bot["show_config"]["edge_pairs_nr"] = len(bot["edge"])
         else:
             bot["show_config"]["edge_pairs_nr"] = 0
 
-    write_raw("all_bot_data", data, "calc_daily")
+    write_raw("all_bots", data, "calculate_per_bot")
     return data
     # sum(item['daily'] for item in myList)
 
@@ -297,7 +306,7 @@ def calculate_totals(data):
             "fiat_value"
         ]
 
-    write_raw(all_bot_data["bot_name"], all_bot_data, "calc_totals")
+    write_raw("all_bots", all_bot_data, "calculate_totals")
 
     return all_bot_data
 
@@ -336,7 +345,7 @@ with Flow("FREQWATCH", schedule=schedule) as flow:
     data = get_data(config)
     # houston_realtor_data = transform(realtor_data)
     # load_to_database = load(houston_realtor_data)
-    data = calculate_daily(data)
+    data = calculate_per_bot(data)
     totals = calculate_totals(data)
     write_html(data, totals, output)
 
