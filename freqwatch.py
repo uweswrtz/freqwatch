@@ -130,14 +130,16 @@ def get_data(config):
 
         # print(output)
         # print('{} {: 4.2f} {}'.format(item['date'], item['abs_profit'], item['trade_count']))
+        server_url = bot.get("api_server", {}).get("server_url")
+        if server_url == None:
+            url = bot.get("api_server", {}).get("listen_ip_address", "127.0.0.1")
+            port = bot.get("api_server", {}).get("listen_port", "8080")
+            server_url = f"http://{url}:{port}"
 
-        url = bot.get("api_server", {}).get("listen_ip_address", "127.0.0.1")
-        port = bot.get("api_server", {}).get("listen_port", "8080")
         username = bot.get("api_server", {}).get("username")
         password = bot.get("api_server", {}).get("password")
-
-        server_url = f"http://{url}:{port}"
-        # print('{} {} {}'.format(server_url, username, password))
+       
+        print('{} {} {}'.format(server_url, username, password))
         this_bot_data["server_url"] = server_url
 
         client = FtRestClient(server_url, username, password)
