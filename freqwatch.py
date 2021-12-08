@@ -139,7 +139,7 @@ def get_data(config):
         username = bot.get("api_server", {}).get("username")
         password = bot.get("api_server", {}).get("password")
        
-        print('{} {} {}'.format(server_url, username, password))
+        # print('{} {} {}'.format(server_url, username, password))
         this_bot_data["server_url"] = server_url
 
         client = FtRestClient(server_url, username, password)
@@ -198,6 +198,12 @@ def get_data(config):
         # print(this_bot_data)
         else:
             logger.warning("Status is NONE")
+            this_bot_data["show_config"] = {"state": "not_running"}
+            write_raw(
+                this_bot_data["bot_name"], this_bot_data["show_config"], "show_config"
+            )
+            bot_data.append(this_bot_data)
+           
 
     # logger.info("Stopped get_data")
     # print(bot_data)
@@ -210,7 +216,8 @@ def calculate_per_bot(data):
 
     now = datetime.utcnow().timestamp()
 
-    for bot in data:
+    #for bot in data:
+    for bot in (bot for bot in data if bot["show_config"]["state"] == "running"):
         # logger.info(bot['show_config']['bot_name'])
 
         if bot["profit"]["first_trade_timestamp"] == 0:
@@ -288,7 +295,8 @@ def calculate_totals(data):
 
     # now = datetime.utcnow().timestamp()
 
-    for bot in data:
+    #for bot in data:
+    for bot in (bot for bot in data if bot["show_config"]["state"] == "running"):
 
         all_bot_data["profit"]["profit_closed_coin"] += bot["profit"]["profit_closed_coin"]
         all_bot_data["profit"]["profit_closed_fiat"] += bot["profit"]["profit_closed_fiat"]
