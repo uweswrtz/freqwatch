@@ -139,7 +139,7 @@ def get_data(config):
         username = bot.get("api_server", {}).get("username")
         password = bot.get("api_server", {}).get("password")
        
-        # print('{} {} {}'.format(server_url, username, password))
+        # logger.info('{} {} {}'.format(server_url, username, password))
         this_bot_data["server_url"] = server_url
 
         client = FtRestClient(server_url, username, password)
@@ -152,7 +152,7 @@ def get_data(config):
         # logger.info(type(this_bot_data['status']))
         # if this_bot_data['show_config'] is not None:
 
-        if this_bot_data["show_config"]:
+        if this_bot_data["show_config"] and this_bot_data["show_config"].get("detail", "Authorized") != "Unauthorized":
             this_bot_data["last_update_time"] = datetime.utcnow().timestamp() * 1000
 
             this_bot_data["version"] = client.version()
@@ -168,13 +168,18 @@ def get_data(config):
             this_bot_data["status"] = client.status()
             write_raw(this_bot_data["bot_name"], this_bot_data["status"], "status")
 
-            this_bot_data["strategies"] = client.strategies()
+            # this_bot_data["strategies"] = client.strategies()
+            # write_raw(
+            #     this_bot_data["bot_name"], this_bot_data["strategies"], "strategies"
+            # )
+
+            this_bot_data["balance"] = client.balance()
             write_raw(
-                this_bot_data["bot_name"], this_bot_data["strategies"], "strategies"
+                this_bot_data["bot_name"], this_bot_data["balance"], "balance"
             )
 
-            this_bot_data["locks"] = client.strategies()
-            write_raw(this_bot_data["bot_name"], this_bot_data["locks"], "locks")
+            # this_bot_data["locks"] = client.locks()
+            # write_raw(this_bot_data["bot_name"], this_bot_data["locks"], "locks")
 
             this_bot_data["edge"] = client.edge()
             write_raw(this_bot_data["bot_name"], this_bot_data["edge"], "edge")
@@ -192,17 +197,24 @@ def get_data(config):
                     item["abs_profit"], item["trade_count"]
                 )
             logger.info(output)
-            bot_data.append(this_bot_data)
+            #bot_data.append(this_bot_data)
         #       except:
         #          logger.error(output + " ERROR")
         # print(this_bot_data)
+        elif this_bot_data["show_config"] and this_bot_data["show_config"].get("detail", "Authorized") == "Unauthorized":
+            logger.warning("Authorization failed")
+            this_bot_data["show_config"] = {"state": "not_authorized"}
+            write_raw(
+                this_bot_data["bot_name"], this_bot_data["show_config"], "show_config"
+            )
         else:
-            logger.warning("Status is NONE")
+            logger.warning("Connection error - no show_config")
             this_bot_data["show_config"] = {"state": "not_running"}
             write_raw(
                 this_bot_data["bot_name"], this_bot_data["show_config"], "show_config"
             )
-            bot_data.append(this_bot_data)
+        
+        bot_data.append(this_bot_data)
            
 
     # logger.info("Stopped get_data")
@@ -262,8 +274,10 @@ def calculate_per_bot(data):
             )
 
             for ot in bot["status"]:
-                if int( divmod((now - ot["open_timestamp"] / 1000), 60 * 60)[0]) > 12:
-                    bot["count"]["nr_long_open"] += 1     
+                ot["is_long_running"] = False
+                if int( divmod((now - ot["open_timestamp"] / 1000), 60 * 60)[0]) > 24:
+                    bot["count"]["nr_long_open"] += 1
+                    ot["is_long_running"] = True
 
             # nr more neede to have at least max running
             bot["count"]["total_max_needed"] = bot["count"]["max"] + bot["count"]["nr_long_open"]
@@ -320,6 +334,14 @@ def calculate_totals(data):
 
     return all_bot_data
 
+@task
+def summary_long_running(data) -> None:
+
+    summary = {}
+    for bot in (bot for bot in data if bot["show_config"]["state"] == "running"):
+        summary[bot.get("bot_name")] = bot.get("count").get("nr_long_open")
+
+    write_raw("all_bots", summary, "summary_long_running")
 
 @task
 def write_html(data, totals, folder) -> None:
@@ -356,6 +378,7 @@ with Flow("FREQWATCH", schedule=schedule) as flow:
     # houston_realtor_data = transform(realtor_data)
     # load_to_database = load(houston_realtor_data)
     data = calculate_per_bot(data)
+    summary_long_running(data)
     totals = calculate_totals(data)
     write_html(data, totals, output)
 

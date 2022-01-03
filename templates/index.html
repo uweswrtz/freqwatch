@@ -22,10 +22,11 @@
                     <td>prof/<br />day</td>
                     <td>am.</td>
                     <td>Curr</td>
+                    <td>stop<br />loss</td>
                     <td>trail</td>
                     <td>Edge</td>
                     <td>#<br />lo<br />op</td>
-                    <td>total<br />max<br />need</td>
+
                     <td>Profit</td>
                     <td>Prof<br />fiat</td>
                     
@@ -79,6 +80,7 @@
                     <td class="has-text-right has-text-weight-bold">{{ '%0.2f'| format(bot['profit']['avg_per_day_all_time_fiat']|float) }}</td>
                     <td>{{ bot['show_config']['stake_amount'] }}</td>
                     <td>{{ bot['show_config']['stake_currency'] }}</td>
+                    <td>{{ bot['show_config']['stoploss'] }}</td>
                     <td>{{ bot['show_config']['trailing_stop'] }}</td>
                     <td>
                         {% if (bot['show_config']['edge_pairs_nr'] ) > 0 %}
@@ -88,7 +90,6 @@
                         {% endif %}
                     </td>
                     <td>{{ bot['count']['nr_long_open'] }}</td>
-                    <td>{{ bot['count']['total_max_needed'] }}</td>
                     <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_coin']|float) }}</td>
                     <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_fiat']|float) }}</td>
                     
