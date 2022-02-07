@@ -18,18 +18,15 @@
                     <td>time<br />frame</td>
                     <td>tod.<br />fiat</td>
                     <td>tod.<br />#</td>
-                    <td>open</td>
+                    <td>open/max<br />long</td>
                     <td>prof/<br />day</td>
                     <td>am.</td>
                     <td>Curr</td>
                     <td>stop<br />loss</td>
                     <td>trail</td>
                     <td>Edge</td>
-                    <td>#<br />lo<br />op</td>
-
                     <td>Profit</td>
-                    <td>Prof<br />fiat</td>
-                    
+                    <td>Prof<br />fiat</td>                    
                     <td>Days</td>
                     <td>Win<br />rate</td>
                     <td>W</td>
@@ -38,7 +35,7 @@
                     <td>7d<br />prof</td>
                     <td>version</td>
                     <td>today</td> <td>-1d</td> <td>-2d</td> <td>-3d</td><td>-4d</td><td>-5d</td><td>-6d</td>
-                    <td>amazingsuperlongfilename</td>
+                    <td>amazingsuperlongoriginalfilename</td>
                 </tr>
             </th>
             <tbody>
@@ -65,11 +62,11 @@
                     <td class="has-text-right ">
                         {% if bot['count']['current'] > 0 %}
                             {% if (bot['status'][0]['open_hours'] ) > 48 %}
-                                <button class="button is-danger is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }} ({{ bot['status'][0]['open_hours'] }})</button>
+                                <button class="button is-danger is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }}<br />{{ bot['count']['nr_long_open'] }} ({{ bot['status'][0]['open_hours'] }})</button>
                             {% elif (bot['status'][0]['open_hours'] ) > 24 %}
-                                <button class="button is-warning is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }} ({{ bot['status'][0]['open_hours'] }}) </button>    
+                                <button class="button is-warning is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }}<br />{{ bot['count']['nr_long_open'] }} ({{ bot['status'][0]['open_hours'] }}) </button>    
                             {% else %}
-                                <button class="button is-success is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }} ({{ bot['status'][0]['open_hours'] }})</button>
+                                <button class="button is-success is-light is-fullwidth">{{ bot['count']['current'] }}/{{ bot['show_config']['max_open_trades'] }}<br />{{ bot['count']['nr_long_open'] }} ({{ bot['status'][0]['open_hours'] }})</button>
                             {% endif %}
                             
                         {% else %}
@@ -89,7 +86,7 @@
                             <button class="button is-warning is-light is-fullwidth">OFF</button>    
                         {% endif %}
                     </td>
-                    <td>{{ bot['count']['nr_long_open'] }}</td>
+
                     <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_coin']|float) }}</td>
                     <td class="has-text-right">{{ '%0.2f'| format(bot['profit']['profit_closed_fiat']|float) }}</td>
                     

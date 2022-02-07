@@ -344,20 +344,42 @@ def summary_long_running(data) -> None:
     write_raw("all_bots", summary, "summary_long_running")
 
 @task
-def write_html(data, totals, folder) -> None:
+def summary_balance(data):
+
+    balance = {}
+    for bot in (bot for bot in data if bot["show_config"]["state"] == "running"):
+        #logger.info(f'balance for {bot["bot_name"]}')
+        bot_exchange = bot["show_config"]["exchange"]
+        bot_currency = bot["show_config"]["stake_currency"]
+        bot_bal_currencies = bot["balance"]["currencies"]
+        if not bot_exchange in balance:
+            balance[bot_exchange] = {}
+        if bot_currency in balance[bot_exchange]:
+            balance[bot_exchange][bot_currency] = min(balance[bot_exchange][bot_currency], next(c for c in bot_bal_currencies if c["currency"] == bot_currency)["free"])
+        else:
+            cur_in_currencies = [c for c in bot_bal_currencies if c["currency"] == bot_currency]
+            if len(cur_in_currencies) >0:
+                #logger.info(f'balance cur_in_currencies {cur_in_currencies}')
+                balance[bot_exchange][bot_currency] = cur_in_currencies[0]["free"]
+
+    write_raw("all_bots", balance, "balance")
+    return balance
+
+@task
+def write_html(data, totals, folder, template_name = "index.html") -> None:
     # logger.info("write_html")
     # print("Hello, {}!".format(person))
 
     file_loader = FileSystemLoader("templates")
     env = Environment(loader=file_loader)
 
-    template = env.get_template("index.html")
+    template = env.get_template(template_name)
 
     output = template.render(
         bot_data=data, now=datetime.today().strftime("%Y-%m-%d-%H:%M:%S"), totals=totals
     )
 
-    with open(f"{folder}/index.html", "w") as fh:
+    with open(f"{folder}/{template_name}", "w") as fh:
         fh.write(output)
 
 
@@ -379,6 +401,7 @@ with Flow("FREQWATCH", schedule=schedule) as flow:
     # load_to_database = load(houston_realtor_data)
     data = calculate_per_bot(data)
     summary_long_running(data)
+    balance = summary_balance(data)
     totals = calculate_totals(data)
     write_html(data, totals, output)
 
