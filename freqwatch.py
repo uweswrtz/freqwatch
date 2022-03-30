@@ -184,7 +184,7 @@ def get_data(config):
             this_bot_data["edge"] = client.edge()
             write_raw(this_bot_data["bot_name"], this_bot_data["edge"], "edge")
 
-            this_bot_data["daily"] = client.daily()
+            this_bot_data["daily"] = client.daily(days=30)
             write_raw(this_bot_data["bot_name"], this_bot_data["daily"], "daily")
 
             this_bot_data["daily_data"] = this_bot_data["daily"].get("data")
@@ -262,6 +262,10 @@ def calculate_per_bot(data):
         else:
             bot["profit"]["winning_rate"] = 0
 
+        bot["profit"]["30d"] = 0
+        for daily in bot['daily_data']:
+            bot["profit"]["30d"] += daily['fiat_value']
+
         bot["count"]["nr_long_open"] = 0
         bot["count"]["total_max_needed"] = 0  #
         if bot["count"]["current"] > 0:
@@ -304,6 +308,7 @@ def calculate_totals(data):
     all_bot_data["profit"]["losing_trades"] = 0
     all_bot_data["profit"]["today_profit_fiat"] = 0
     all_bot_data["profit"]["yesterday_profit_fiat"] = 0
+    all_bot_data["profit"]["30d_profit_fiat"] = 0
 
     all_bot_data["active_bots"] = len(data)
 
@@ -329,6 +334,7 @@ def calculate_totals(data):
         all_bot_data["profit"]["yesterday_profit_fiat"] += bot["daily"]["data"][1][
             "fiat_value"
         ]
+        all_bot_data["profit"]["30d_profit_fiat"] += bot["profit"]["30d"]
 
     write_raw("all_bots", all_bot_data, "calculate_totals")
 

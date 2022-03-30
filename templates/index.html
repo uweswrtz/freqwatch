@@ -4,7 +4,7 @@
     <h1 class="title">{% block title %} Bot summary {% endblock %}</h1>
     <p>last updated: {{ now }}</p>
     <h2 class="subtitle">{{ totals['active_bots'] }} active bots with total profit {{ '%0.2f'| format(totals['profit']['profit_closed_fiat']|float) }}</h2>
-    <h2 class="subtitle">today: {{ '%0.2f'| format(totals['profit']['today_profit_fiat']|float) }} yesterday: {{ '%0.2f'| format(totals['profit']['yesterday_profit_fiat']|float)}}</h2>
+    <h2 class="subtitle">today: {{ '%0.2f'| format(totals['profit']['today_profit_fiat']|float) }} yesterday: {{ '%0.2f'| format(totals['profit']['yesterday_profit_fiat']|float)}} 30day: {{ '%0.2f'| format(totals['profit']['30d_profit_fiat']|float)}}</h2>
 
 
     <div class="table-container">
@@ -16,6 +16,7 @@
                     <td>Ex</td>
                     <td>Strategy</td>
                     <td>time<br />frame</td>
+                    <!-- <td>tod.<br />abs</td> -->
                     <td>tod.<br />fiat</td>
                     <td>tod.<br />#</td>
                     <td>open/max<br />long</td>
@@ -32,10 +33,12 @@
                     <td>W</td>
                     <td>L</td>
 
-                    <td>7d<br />prof</td>
+                    <td>30d<br />prof</td>
                     <td>version</td>
-                    <td>today</td> <td>-1d</td> <td>-2d</td> <td>-3d</td><td>-4d</td><td>-5d</td><td>-6d</td>
-                    <td>amazingsuperlongoriginalfilename</td>
+                    {% for d in range(0,-30,-1) %}
+                    <td>{{d}}d</td>
+                    {% endfor %}
+                    <td>amazingsuperlongoriginalfilenameuglyspacekeeper</td>
                 </tr>
             </th>
             <tbody>
@@ -56,7 +59,7 @@
                     <td>{{ bot['show_config']['exchange'] }}</td>
                     <td>{{ bot['show_config']['strategy'] }}</td>
                     <td>{{ bot['show_config']['timeframe'] }}</td>
-
+                    <!-- <td class="has-text-right">{{ '%0.4f'| format(bot['daily_data'][0]['abs_profit']|float)}}</td> -->
                     <td class="has-text-right">{{ '%0.2f'| format(bot['daily_data'][0]['fiat_value']|float)}}</td>
                     <td class="has-text-right">{{ bot['daily_data'][0]['trade_count'] }}</td>
                     <td class="has-text-right ">
