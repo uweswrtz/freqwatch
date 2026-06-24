@@ -1,2 +1,2 @@
-prefect==0.15.6
+prefect==3.6.28.dev2
 python-rapidjson==1.4
